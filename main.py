@@ -1,7 +1,4 @@
-
 import tkinter as tk
-from tkinter import messagebox
-
 import gramatica_module as gramatica
 import tramas_module as tramas
 
@@ -15,15 +12,25 @@ def ejecutar_tramas(root):
 
 def main():
     root = tk.Tk()
-    root.title("Proyecto Final DII - Menú Principal")
-    root.geometry("400x220")
-    root.configure(bg="#f0f0f0")
+    root.title("📚 Proyecto Final - Menú Principal")
+    root.geometry("600x300")
+    root.configure(bg="#f4f4f4")
 
-    tk.Label(root, text="Sistema de Gramática y Tramas", font=("Arial", 14, "bold"), bg="#f0f0f0").pack(pady=15)
+    frame = tk.Frame(root, bg="#f4f4f4")
+    frame.place(relx=0.5, rely=0.5, anchor='center')  # centrado
+
+    titulo = tk.Label(
+        frame,
+        text="🧪 Sistema de Evaluación\nGramáticas & Tramas FSM",
+        font=("Arial", 16, "bold"),
+        bg="#f4f4f4"
+    )
+    titulo.pack(pady=(10, 20))
 
     tk.Button(
-        root,
-        text="Módulo Gramática",
+        frame,
+        text="📖 Módulo Gramática",
+        font=("Arial", 12),
         width=30,
         height=2,
         bg="#cce5ff",
@@ -31,8 +38,9 @@ def main():
     ).pack(pady=5)
 
     tk.Button(
-        root,
-        text="Módulo Tramas (FSM)",
+        frame,
+        text="📡 Módulo Tramas (FSM)",
+        font=("Arial", 12),
         width=30,
         height=2,
         bg="#d5f5e3",
