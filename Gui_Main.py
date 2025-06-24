@@ -47,13 +47,13 @@ def main():
     titulo.pack(pady=15)
 
     boton_gramatica = tk.Button(
-        root, text="🔤 Módulo Gramática", width=30, height=2,
+        root, text="Módulo Gramática", width=30, height=2,
         command=ejecutar_gramatica, bg="#cce5ff", fg="black", font=("Arial", 10)
     )
     boton_gramatica.pack(pady=5)
 
     boton_tramas = tk.Button(
-        root, text="📡 Módulo Tramas (FSM)", width=30, height=2,
+        root, text="Módulo Tramas (FSM)", width=30, height=2,
         command=ejecutar_tramas, bg="#d5f5e3", fg="black", font=("Arial", 10)
     )
     boton_tramas.pack(pady=5)
