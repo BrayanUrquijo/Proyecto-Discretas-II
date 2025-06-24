@@ -1,62 +1,37 @@
-def ingresar_lista_validacion():
-    """
-    Pide al usuario ingresar una lista de validación compuesta por valores enteros
-    entre 0 y 15. Cada valor se construye con 4 bits ingresados uno a uno.
-    Devuelve una lista de enteros.
-    """
+
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+
+def ingresar_lista_validacion_gui(entry_box, output):
     lista = []
-    print("Ingrese la cantidad de elementos de la lista de validación (max 20):")
-    cantidad = int(input())
-    for i in range(cantidad):
-        bits = []
-        print(f"Elemento {i+1} (4 bits):")
-        while len(bits) < 4:
-            bit = input(f"  Bit {len(bits)+1}: ")
-            if bit not in ('0', '1'):
-                print("  Solo se permiten 0 o 1")
-                continue
-            bits.append(bit)
-        valor = int(''.join(bits), 2)
+    bits_text = entry_box.get('1.0', 'end').strip().splitlines()
+    for line in bits_text:
+        bits = line.strip().replace(' ', '')
+        if len(bits) != 4 or any(b not in '01' for b in bits):
+            output.insert('end', f"Error: '{line}' no es un grupo válido de 4 bits\n")
+            continue
+        valor = int(bits, 2)
         lista.append(valor)
     return lista
 
-
-def ingresar_tramas():
-    """
-    Permite ingresar entre 5 y 20 tramas de 32 bits, bit por bit.
-    Devuelve una lista de cadenas de bits.
-    """
+def ingresar_tramas_gui(entry_box, output):
     tramas = []
-    print("Ingrese la cantidad de tramas (entre 5 y 20):")
-    n = int(input())
-    for i in range(n):
-        bits = []
-        print(f"Trama {i+1} (32 bits):")
-        while len(bits) < 32:
-            bit = input(f"  Bit {len(bits)+1}: ")
-            if bit not in ('0', '1'):
-                print("  Solo se permiten 0 o 1")
-                continue
-            bits.append(bit)
-        tramas.append(''.join(bits))
+    trama_lines = entry_box.get('1.0', 'end').strip().splitlines()
+    for line in trama_lines:
+        trama = line.strip().replace(' ', '')
+        if len(trama) != 32 or any(b not in '01' for b in trama):
+            output.insert('end', f"Error: Trama inválida '{line}'\n")
+            continue
+        tramas.append(trama)
     return tramas
 
-
 def validar_tramas(tramas, lista_validacion):
-    """
-    Valida cada trama según las siguientes condiciones:
-    - Se extraen los bits 10 al 14 (inclusive) de cada trama.
-    - Se convierten en entero y se verifica:
-        a) Si es múltiplo de 3.
-        b) Si su suma con el valor correspondiente de la lista es múltiplo de 5.
-    Devuelve lista de tuplas: (trama, 'Valida' o 'Invalida')
-    """
     resultados = []
     for i, trama in enumerate(tramas):
         if len(trama) != 32:
             resultados.append((trama, 'Invalida'))
             continue
-        sub_bits = trama[9:14]  # bits 10 a 14
+        sub_bits = trama[9:14]
         valor = int(sub_bits, 2)
         if i >= len(lista_validacion):
             resultados.append((trama, 'Invalida'))
@@ -68,18 +43,49 @@ def validar_tramas(tramas, lista_validacion):
             resultados.append((trama, 'Invalida'))
     return resultados
 
-
-def evaluar_transmision(resultados):
-    """
-    Evalúa si la transmisión es válida según la cantidad de tramas inválidas.
-    Si el porcentaje de error es menor al 20%, la transmisión es válida.
-    """
+def evaluar_transmision_gui(resultados, output):
     total = len(resultados)
     invalidas = sum(1 for _, estado in resultados if estado == 'Invalida')
-    error = (invalidas / total) * 100
-    print(f"\nTotal tramas: {total}")
-    print(f"Tramas inválidas: {invalidas} ({error:.2f}%)")
+    error = (invalidas / total) * 100 if total else 0
+    output.insert('end', f"\nTotal tramas: {total}\n")
+    output.insert('end', f"Tramas inválidas: {invalidas} ({error:.2f}%)\n")
     if error < 20:
-        print("\nTransmisión correcta.")
+        output.insert('end', "Transmisión correcta.\n")
     else:
-        print("\nTransmisión con errores (>20%).")
+        output.insert('end', "Transmisión con errores (>20%).\n")
+
+def main():
+    root = tk.Tk()
+    root.title("Módulo Tramas (FSM)")
+    root.geometry("700x700")
+
+    tk.Label(root, text="Lista de validación (una línea por valor, 4 bits):").pack(anchor='w', padx=10, pady=(10, 0))
+    valid_box = scrolledtext.ScrolledText(root, width=60, height=6)
+    valid_box.pack(padx=10)
+
+    tk.Label(root, text="Tramas (una por línea, 32 bits):").pack(anchor='w', padx=10, pady=(10, 0))
+    tramas_box = scrolledtext.ScrolledText(root, width=60, height=10)
+    tramas_box.pack(padx=10)
+
+    output = scrolledtext.ScrolledText(root, width=80, height=15, state='normal')
+    output.pack(padx=10, pady=10)
+
+    def procesar():
+        output.delete('1.0', 'end')
+        lista = ingresar_lista_validacion_gui(valid_box, output)
+        tramas = ingresar_tramas_gui(tramas_box, output)
+        if not lista or not tramas:
+            output.insert('end', "Datos insuficientes para evaluar.\n")
+            return
+        resultados = validar_tramas(tramas, lista)
+        for i, (trama, estado) in enumerate(resultados, 1):
+            output.insert('end', f"Trama {i}: {estado}\n")
+        evaluar_transmision_gui(resultados, output)
+
+    btn = tk.Button(root, text="Evaluar Transmisión", command=procesar)
+    btn.pack(pady=10)
+    tk.Button(root, text="Salir", command=lambda: [root.destroy(), __import__('main').main()]).pack(pady=5)
+
+
+
+    root.mainloop()
