@@ -75,7 +75,7 @@ def main():
     s_entry.pack(padx=10)
 
     tk.Label(root, text="📐 Producciones (una por línea: A -> a B)", font=('Arial', 11), bg="#f4f4f4").pack(padx=10, anchor='w', pady=(10, 0))
-    prod_text = scrolledtext.ScrolledText(root, width=70, height=10, font=('Consolas', 11))
+    prod_text = scrolledtext.ScrolledText(root, width=60, height=6, font=('Consolas', 10))
     prod_text.pack(padx=10, pady=(0, 10))
 
     output = scrolledtext.ScrolledText(root, width=85, height=15, font=('Consolas', 11), bg='#ffffff')
